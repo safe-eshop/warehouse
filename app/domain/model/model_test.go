@@ -1,38 +1,25 @@
 package model
 
 import (
+	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
 func TestNewWarehouseState(t *testing.T) {
 	subject := NewWarehouseState("a", 1, 3)
-	if subject.GetID() != "a" {
-		t.Error("CatalogItemId should equal a")
-	}
-	if subject.ShopQuantity != 1 {
-		t.Error("quantity should equal 1")
-	}
-	if subject.Reservation != 3 {
-		t.Error("reservation should equal 3")
-	}
+	assert.Equal(t, subject.GetID(), "a", "they should be equal")
+	assert.Equal(t, subject.ShopQuantity, 1, "they should be equal")
+	assert.Equal(t, subject.Reservation, 3, "they should be equal")
 }
 
 func TestGetAvailableQuantityIfReservationIsGreater(t *testing.T) {
 	warehouse := NewWarehouseState("a", 1, 3)
 	subject := warehouse.GetAvailableQuantity()
-	if subject == 0 {
-		t.Log("Correct value")
-	} else {
-		t.Error("Available quantity should be 0")
-	}
+	assert.Equal(t, subject, 0, "they should be equal")
 }
 
 func TestGetAvailableQuantityIfReservationIsSmaller(t *testing.T) {
 	warehouse := NewWarehouseState("a", 3, 1)
 	subject := warehouse.GetAvailableQuantity()
-	if subject == 2 {
-		t.Log("Correct value")
-	} else {
-		t.Error("Available quantity should be 2")
-	}
+	assert.Equal(t, subject, 2, "they should be equal")
 }
