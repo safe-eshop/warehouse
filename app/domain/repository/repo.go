@@ -1,6 +1,16 @@
 package repository
 
-import "rossmann/app/domain/model"
+import (
+	"errors"
+	"rossmann/app/domain/model"
+)
+
+type QueryError struct {
+	Id  string
+	Err error
+}
+
+var ErrNotFound = errors.New("WarehouseState not found")
 
 type WarehouseStateRepository interface {
 	FindById(id string) (*model.WarehouseState, error)
