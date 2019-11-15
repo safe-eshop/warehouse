@@ -1,6 +1,8 @@
 package domain
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestNewWarehouseState(t *testing.T) {
 	subject := NewWarehouseState("a", 1, 3)
