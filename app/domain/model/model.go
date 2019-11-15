@@ -1,4 +1,4 @@
-package domain
+package model
 
 type WarehouseState struct {
 	CatalogItemId string `json:"catalogItemId,omitempty"`
