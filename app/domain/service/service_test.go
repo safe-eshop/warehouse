@@ -1,6 +1,7 @@
 package service
 
 import (
+	"errors"
 	"github.com/stretchr/testify/assert"
 	"testing"
 	"warehouse/app/domain/model"
@@ -8,6 +9,14 @@ import (
 )
 
 type ErrorRepo struct {
+}
+
+func (r ErrorRepo) Count() (int64, error) {
+	return 0, errors.New("Test")
+}
+
+func (r ErrorRepo) InsertMany(states []*model.WarehouseState) error {
+	return errors.New("Test")
 }
 
 func (r ErrorRepo) FindById(id string) (*model.WarehouseState, error) {
@@ -33,6 +42,14 @@ func TestFindAvailableQuantitiesWhenRepositoryReturnError(t *testing.T) {
 }
 
 type OkRepo struct {
+}
+
+func (r OkRepo) Count() (int64, error) {
+	return 0, nil
+}
+
+func (r OkRepo) InsertMany(states []*model.WarehouseState) error {
+	return nil
 }
 
 func (r OkRepo) FindById(id string) (*model.WarehouseState, error) {

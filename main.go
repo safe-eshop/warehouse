@@ -30,6 +30,7 @@ func main() {
 	stateRepository := repository.NewWarehouseStateRepository(NewClient())
 	stateService := service.NewWarehouseStateService(stateRepository)
 	useCase := usecase.NewWarehouseStateUseCaseUseCase(stateRepository, stateService)
+	_ = useCase.SeedDatabase()
 	r.GET("/state/:catalogItemId", func(c *gin.Context) {
 		catalogItemId := c.Param("catalogItemId")
 		stock, err := useCase.GetAvailableCatalogItemQuantity(catalogItemId)

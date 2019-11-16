@@ -1,9 +1,11 @@
 package repository
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/go-redis/redis/v7"
+	"time"
 	"warehouse/app/domain/model"
 	model3 "warehouse/app/infrastructure/model"
 )
@@ -26,6 +28,37 @@ func getRedisKeys(ids []string) []string {
 		res[i] = getRedisKey(id)
 	}
 	return res
+}
+
+func (r *redisWarehouseStateRepository) Count() (int64, error) {
+	result, err := r.redis.DbSize().Result()
+	if err != nil {
+		return 0, nil
+	}
+	return result, nil
+}
+
+func (r *redisWarehouseStateRepository) InsertMany(states []*model.WarehouseState) error {
+	pipeline := r.redis.Pipeline()
+	ctx := context.Background()
+	for _, state := range states {
+		key := getRedisKey(state.CatalogItemId)
+		redisVal, err := json.Marshal(model3.FromWarehouseState(*state))
+		if err != nil {
+			return err
+		}
+
+		err = pipeline.Set(key, redisVal, 24*time.Hour).Err()
+		if err != nil {
+			return err
+		}
+	}
+	_, err := pipeline.ExecContext(ctx)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (r *redisWarehouseStateRepository) FindById(id string) (*model.WarehouseState, error) {

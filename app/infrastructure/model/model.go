@@ -23,3 +23,7 @@ func (w *RedisWarehouseState) ToWarehouseState() *model.WarehouseState {
 		Reservation:   w.Reservation,
 	}
 }
+
+func FromWarehouseState(model model.WarehouseState) *RedisWarehouseState {
+	return NewWarehouseState(model.GetID(), model.ShopQuantity, model.Reservation)
+}
