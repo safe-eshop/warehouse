@@ -4,9 +4,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
-	"rossmann/app/application/usecase"
-	"rossmann/app/domain/service"
-	"rossmann/app/infrastructure/repository"
+	"warehouse/app/application/usecase"
+	"warehouse/app/domain/service"
+	"warehouse/app/infrastructure/repository"
 )
 import "github.com/go-redis/redis/v7"
 

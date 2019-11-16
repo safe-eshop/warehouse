@@ -2,7 +2,7 @@ package repository
 
 import (
 	"errors"
-	"rossmann/app/domain/model"
+	"warehouse/app/domain/model"
 )
 
 type QueryError struct {

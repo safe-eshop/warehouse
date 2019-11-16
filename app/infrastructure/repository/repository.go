@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/go-redis/redis/v7"
-	"rossmann/app/domain/model"
-	model3 "rossmann/app/infrastructure/model"
+	"warehouse/app/domain/model"
+	model3 "warehouse/app/infrastructure/model"
 )
 
 type redisWarehouseStateRepository struct {

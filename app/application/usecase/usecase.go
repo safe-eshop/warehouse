@@ -1,8 +1,8 @@
 package usecase
 
 import (
-	"rossmann/app/domain/repository"
-	"rossmann/app/domain/service"
+	"warehouse/app/domain/repository"
+	"warehouse/app/domain/service"
 )
 
 type WarehouseStateUseCase interface {

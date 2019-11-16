@@ -1,6 +1,6 @@
 package service
 
-import "rossmann/app/domain/repository"
+import "warehouse/app/domain/repository"
 
 type WarehouseStateService struct {
 	repo repository.WarehouseStateRepository

@@ -1,7 +1,7 @@
 # build stage
 FROM golang:1.13 AS build-env
 
-ENV GO111MODULE=off \
+ENV GO111MODULE=on \
     CGO_ENABLED=0 \
     GOOS=linux \
     GOARCH=amd64

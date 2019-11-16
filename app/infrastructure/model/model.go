@@ -1,6 +1,6 @@
 package model
 
-import "rossmann/app/domain/model"
+import "warehouse/app/domain/model"
 
 type RedisWarehouseState struct {
 	CatalogItemId string `json:"catalogItemId,omitempty"`
