@@ -1,4 +1,4 @@
-module rossmann
+module warehouse
 
 go 1.13
 
