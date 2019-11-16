@@ -14,6 +14,14 @@ func NewWarehouseState(id string, quantity, reservation int) *WarehouseState {
 	}
 }
 
+func Zero(id string) *WarehouseState {
+	return &WarehouseState{
+		CatalogItemId: id,
+		ShopQuantity:  0,
+		Reservation:   0,
+	}
+}
+
 func (w *WarehouseState) GetID() string {
 	return w.CatalogItemId
 }

@@ -23,13 +23,16 @@ func getRedisKey(id string) string {
 func (r *redisWarehouseStateRepository) FindById(id string) (*model.WarehouseState, error) {
 	redisKey := getRedisKey(id)
 	res, err := r.redis.Get(redisKey).Result()
-	if err != redis.Nil {
+	if err == redis.Nil {
+		return model.Zero(id), nil
+	} else if err != nil {
 		return nil, err
+	} else {
+		var redisModel model3.RedisWarehouseState
+		err = json.Unmarshal([]byte(res), &redisModel)
+		if err != nil {
+			return nil, err
+		}
+		return redisModel.ToWarehouseState(), nil
 	}
-	var redisModel model3.RedisWarehouseState
-	err = json.Unmarshal([]byte(res), &redisModel)
-	if err != nil {
-		return nil, err
-	}
-	return redisModel.ToWarehouseState(), nil
 }

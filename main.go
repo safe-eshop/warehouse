@@ -1,30 +1,45 @@
 package main
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
-	"rossmann/app/domain/model"
+	"log"
+	"net/http"
+	"rossmann/app/application/usecase"
+	"rossmann/app/domain/service"
+	"rossmann/app/infrastructure/repository"
 )
 import "github.com/go-redis/redis/v7"
 
-func ExampleNewClient() {
+func NewClient() *redis.Client {
 	client := redis.NewClient(&redis.Options{
 		Addr:     "localhost:6379",
 		Password: "", // no password set
 		DB:       0,  // use default DB
 	})
 
-	pong, err := client.Ping().Result()
-	fmt.Println(pong, err)
-	// Output: PONG <nil>
+	_, err := client.Ping().Result()
+	if err != nil {
+		log.Fatal(err)
+	}
+	return client
+
 }
 
 func main() {
 	r := gin.Default()
+	stateRepository := repository.NewWarehouseStateRepository(NewClient())
+	stateService := service.NewWarehouseStateService(stateRepository)
+	useCase := usecase.NewWarehouseStateUseCaseUseCase(stateRepository, stateService)
+	r.GET("/:catalogItemId", func(c *gin.Context) {
+		catalogItemId := c.Param("catalogItemId")
+		stock, err := useCase.GetAvailableCatalogItemQuantity(catalogItemId)
+		if err != nil {
+			log.Println(err)
+			c.String(http.StatusInternalServerError, "unknown error")
+		} else {
+			c.JSON(200, gin.H{"availableQuantity": stock, "catalogItemId": catalogItemId})
+		}
 
-	r.GET("/ping/:quantity", func(c *gin.Context) {
-		stock := model.NewWarehouseState("hagjhdsag", 2, 4)
-		c.JSON(200, stock)
 	})
 	_ = r.Run("0.0.0.0:9000") // listen and serve on 0.0.0.0:8080
 }
