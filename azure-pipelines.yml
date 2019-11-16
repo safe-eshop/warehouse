@@ -1,0 +1,58 @@
+resources:
+  - repo: self
+
+pr:
+  branches:
+    include:
+      - master
+      - release/v*
+
+trigger:
+  batch: true
+  branches:
+    include:
+      - release/v*
+      - refs/relelase/v*
+      - master
+      - feature/*
+      - topic/*
+      - develop
+      - hotfix/*
+      - refs/tags/v*
+
+jobs:
+
+  - job: docker_ci
+    displayName: "CI"
+    pool:
+      vmImage: 'ubuntu-latest'
+    timeoutInMinutes: 90
+    variables:
+      isPullRequest: $[ eq(variables['Build.Reason'], 'PullRequest') ]
+      imageName: safeshop/warehouse
+      image: ./Dockerfile
+      imageTag: $(Build.SourceBranchName)
+    steps:
+      - task: Docker@2
+        inputs:
+          containerRegistry: 'DockerHub'
+          repository: $(imageName)
+          command: 'build'
+          buildContext: '.'
+          Dockerfile: $(image)
+          tags: |
+            $(Build.SourceBranchName)
+      - task: Docker@2
+        condition: and(succeeded(), ne(variables['isPullRequest'],True))
+        inputs:
+          containerRegistry: 'DockerHub'
+          command: 'login'
+      - task: Docker@2
+        condition: and(succeeded(), ne(variables['isPullRequest'],True))
+        inputs:
+          containerRegistry: 'DockerHub'
+          repository: $(imageName)
+          command: 'push'
+          tags: |
+            $(Build.SourceBranchName)
+
