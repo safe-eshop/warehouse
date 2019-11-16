@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"warehouse/app/domain/dto"
 	"warehouse/app/domain/repository"
 	"warehouse/app/domain/service"
 )
@@ -21,6 +22,10 @@ func NewWarehouseStateUseCaseUseCase(repo repository.WarehouseStateRepository, s
 	}
 }
 
-func (u *warehouseStateUseCaseUsecase) GetAvailableCatalogItemQuantity(id string) (int, error) {
+func (u *warehouseStateUseCaseUsecase) GetAvailableCatalogItemQuantity(id string) (*dto.AvailableQuantity, error) {
 	return u.service.GetAvailableCatalogItemQuantity(id)
+}
+
+func (u *warehouseStateUseCaseUsecase) GetAvailableCatalogItemsQuantity(ids []string) ([]*dto.AvailableQuantity, error) {
+	return u.service.GetAvailableCatalogItemsQuantity(ids)
 }

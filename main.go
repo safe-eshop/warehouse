@@ -30,14 +30,26 @@ func main() {
 	stateRepository := repository.NewWarehouseStateRepository(NewClient())
 	stateService := service.NewWarehouseStateService(stateRepository)
 	useCase := usecase.NewWarehouseStateUseCaseUseCase(stateRepository, stateService)
-	r.GET("/:catalogItemId", func(c *gin.Context) {
+	r.GET("/state/:catalogItemId", func(c *gin.Context) {
 		catalogItemId := c.Param("catalogItemId")
 		stock, err := useCase.GetAvailableCatalogItemQuantity(catalogItemId)
 		if err != nil {
 			log.Println(err)
 			c.String(http.StatusInternalServerError, "unknown error")
 		} else {
-			c.JSON(200, gin.H{"availableQuantity": stock, "catalogItemId": catalogItemId})
+			c.JSON(200, stock)
+		}
+
+	})
+
+	r.GET("/state", func(c *gin.Context) {
+		catalogItemIds := c.QueryArray("ids")
+		stocks, err := useCase.GetAvailableCatalogItemsQuantity(catalogItemIds)
+		if err != nil {
+			log.Println(err)
+			c.String(http.StatusInternalServerError, "unknown error")
+		} else {
+			c.JSON(200, stocks)
 		}
 
 	})

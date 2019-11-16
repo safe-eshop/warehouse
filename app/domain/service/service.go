@@ -1,6 +1,9 @@
 package service
 
-import "warehouse/app/domain/repository"
+import (
+	"warehouse/app/domain/dto"
+	"warehouse/app/domain/repository"
+)
 
 type WarehouseStateService struct {
 	repo repository.WarehouseStateRepository
@@ -10,11 +13,19 @@ func NewWarehouseStateService(repo repository.WarehouseStateRepository) *Warehou
 	return &WarehouseStateService{repo: repo}
 }
 
-func (s *WarehouseStateService) GetAvailableCatalogItemQuantity(id string) (int, error) {
+func (s *WarehouseStateService) GetAvailableCatalogItemQuantity(id string) (*dto.AvailableQuantity, error) {
 	state, err := s.repo.FindById(id)
 	if err != nil {
-		return 0, err
+		return dto.NewAvailableQuantity(id, 0), err
 	}
-	q := state.GetAvailableQuantity()
-	return q, nil
+	return dto.FromWarehouseState(*state), nil
+}
+
+func (s *WarehouseStateService) GetAvailableCatalogItemsQuantity(ids []string) ([]*dto.AvailableQuantity, error) {
+	state, err := s.repo.FindByIds(ids)
+	if err != nil {
+		return nil, err
+	}
+	result := dto.FromWarehouseStates(state)
+	return result, nil
 }
