@@ -1,7 +1,18 @@
 # build stage
-FROM golang:alpine AS build-env
-RUN apk --no-cache add build-base git bzr mercurial gcc
-ADD . .
+FROM golang:1.13 AS build-env
+
+ENV GO111MODULE=on \
+    CGO_ENABLED=0 \
+    GOOS=linux \
+    GOARCH=amd64
+
+COPY go.mod .
+COPY go.sum .
+
+RUN go mod download
+
+COPY . .
+# it will take the flags from the environment
 RUN go build -o warehouse_api
 
 # final stage
