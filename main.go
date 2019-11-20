@@ -2,13 +2,22 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/go-redis/redis/v7"
+	"github.com/streadway/amqp"
 	"log"
 	"net/http"
 	"warehouse/app/application/usecase"
 	"warehouse/app/domain/service"
 	"warehouse/app/infrastructure/repository"
 )
-import "github.com/go-redis/redis/v7"
+
+func connect(connection string) (*amqp.Connection, error) {
+	conn, err := amqp.Dial(connection)
+	if err != nil {
+		return nil, err
+	}
+	return conn, nil
+}
 
 func NewClient() *redis.Client {
 	client := redis.NewClient(&redis.Options{
