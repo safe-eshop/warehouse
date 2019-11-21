@@ -2,13 +2,13 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/go-redis/redis/v7"
 	"github.com/streadway/amqp"
 	"log"
 	"net/http"
-	"os"
 	"warehouse/app/application/usecase"
+	"warehouse/app/common"
 	"warehouse/app/domain/service"
+	"warehouse/app/infrastructure/connection"
 	"warehouse/app/infrastructure/repository"
 )
 
@@ -20,33 +20,15 @@ func connect(connection string) (*amqp.Connection, error) {
 	return conn, nil
 }
 
-func NewClient() *redis.Client {
-	client := redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379",
-		Password: "", // no password set
-		DB:       0,  // use default DB
-	})
-
-	_, err := client.Ping().Result()
-	if err != nil {
-		log.Fatal(err)
-	}
-	return client
-
-}
-
 func getAppPrefix() string {
-	path := os.Getenv("PATH_BASE")
-	if path != "" {
-		return path + "/state"
-	}
-	return "/state"
+	path := common.GetOsEnvOrDefault("PATH_BASE", "/")
+	return path + "states"
 }
 
 func main() {
 	r := gin.Default()
 	router := r.Group(getAppPrefix())
-	stateRepository := repository.NewWarehouseStateRepository(NewClient())
+	stateRepository := repository.NewWarehouseStateRepository(connection.NewRedisClient())
 	stateService := service.NewWarehouseStateService(stateRepository)
 	useCase := usecase.NewWarehouseStateUseCaseUseCase(stateRepository, stateService)
 	_ = useCase.SeedDatabase()
