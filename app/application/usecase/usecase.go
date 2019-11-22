@@ -15,27 +15,27 @@ type WarehouseStateUseCase interface {
 	SeedDatabase() error
 }
 
-type warehouseStateUseCaseUsecase struct {
+type warehouseStateUseCase struct {
 	repo    repository.WarehouseStateRepository
 	service *service.WarehouseStateService
 }
 
-func NewWarehouseStateUseCaseUseCase(repo repository.WarehouseStateRepository, service *service.WarehouseStateService) *warehouseStateUseCaseUsecase {
-	return &warehouseStateUseCaseUsecase{
+func NewWarehouseStateUseCaseUseCase(repo repository.WarehouseStateRepository, service *service.WarehouseStateService) *warehouseStateUseCase {
+	return &warehouseStateUseCase{
 		repo:    repo,
 		service: service,
 	}
 }
 
-func (u *warehouseStateUseCaseUsecase) GetAvailableCatalogItemQuantity(id string) (*dto.AvailableQuantity, error) {
+func (u *warehouseStateUseCase) GetAvailableCatalogItemQuantity(id string) (*dto.AvailableQuantity, error) {
 	return u.service.GetAvailableCatalogItemQuantity(id)
 }
 
-func (u *warehouseStateUseCaseUsecase) GetAvailableCatalogItemsQuantity(ids []string) ([]*dto.AvailableQuantity, error) {
+func (u *warehouseStateUseCase) GetAvailableCatalogItemsQuantity(ids []string) ([]*dto.AvailableQuantity, error) {
 	return u.service.GetAvailableCatalogItemsQuantity(ids)
 }
 
-func (u *warehouseStateUseCaseUsecase) SeedDatabase() error {
+func (u *warehouseStateUseCase) SeedDatabase() error {
 	q, err := u.repo.Count()
 	if err != nil {
 		return err
