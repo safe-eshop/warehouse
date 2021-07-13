@@ -4,10 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/go-redis/redis/v7"
 	"time"
 	"warehouse/app/domain/model"
 	model3 "warehouse/app/infrastructure/model"
+
+	"github.com/go-redis/redis/v8"
 )
 
 type redisWarehouseStateRepository struct {
@@ -31,7 +32,7 @@ func getRedisKeys(ids []string) []string {
 }
 
 func (r *redisWarehouseStateRepository) Count() (int64, error) {
-	result, err := r.redis.DbSize().Result()
+	result, err := r.redis.DBSize().Result()
 	if err != nil {
 		return 0, nil
 	}

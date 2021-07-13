@@ -1,9 +1,10 @@
 package connection
 
 import (
-	"github.com/go-redis/redis/v7"
 	"log"
 	"warehouse/app/common"
+
+	"github.com/go-redis/redis/v8"
 )
 
 func getRedisConnectionString() string {
