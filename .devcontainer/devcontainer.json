@@ -1,35 +1,32 @@
-// If you want to run as a non-root user in the container, see .devcontainer/docker-compose.yml.
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the README at:
+// https://github.com/microsoft/vscode-dev-containers/tree/v0.183.0/containers/go
 {
-	"name": "Warehouse(go and redis)",
 	"dockerComposeFile": "docker-compose.yml",
-	"service": "web",
+	"service": "app",
 	"workspaceFolder": "/workspace",
-	"runArgs": [
-		// Comment out the next line to run as root instead. Linux users, 
-		// update Dockerfile with your user's UID/GID if not 1000.
-		"--cap-add=SYS_PTRACE", "--security-opt", "seccomp=unconfined"
-	],
-	// Use 'settings' to set *default* container specific settings.json values on container create. 
-	// You can edit these settings after create using File > Preferences > Settings > Remote.
-	"settings": { 
-		"terminal.integrated.shell.linux": "/bin/bash",
+	// Add the IDs of extensions you want installed when the container is created.
+	"name": "Go",
+	// Set *default* container specific settings.json values on container create.
+	"settings": {
+		"go.toolsManagement.checkForUpdates": "local",
+		"go.useLanguageServer": true,
 		"go.gopath": "/go",
-		"go.inferGopath": false,
-		"go.useLanguageServer": true
+		"go.goroot": "/usr/local/go"
 	},
 
-	// Uncomment the next line if you want start specific services in your Docker Compose config.
-	// "runServices": [],
-
-	// Uncomment the line below if you want to keep your containers running after VS Code shuts down.
-	// "shutdownAction": "none",
-
-	// Uncomment the next line to run commands after the container is created.
-	"postCreateCommand": "go version",
-
-	// Add the IDs of extensions you want installed when the container is created in the array below.
+	// Add the IDs of extensions you want installed when the container is created.
 	"extensions": [
-		"ms-vscode.go",
-		"mtxr.sqltools"
-	]
+		"golang.Go",
+		"mongodb.mongodb-vscode",
+		"wakatime.vscode-wakatime"
+	],
+
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	// "forwardPorts": [],
+
+	// Use 'postCreateCommand' to run commands after the container is created.
+	// "postCreateCommand": "go version",
+
+	// Comment out connect as root instead. More info: https://aka.ms/vscode-remote/containers/non-root.
+	"remoteUser": "vscode"
 }

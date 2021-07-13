@@ -1,31 +1,41 @@
-#-------------------------------------------------------------------------------------------------------------
-# Copyright (c) Microsoft Corporation. All rights reserved.
-# Licensed under the MIT License. See https://go.microsoft.com/fwlink/?linkid=2090316 for license information.
-#-------------------------------------------------------------------------------------------------------------
-
 version: '3'
-services:
-  web:
-    # Uncomment the next line to use a non-root user. On Linux, this will prevent
-    # new files getting created as root, but you may need to update the USER_UID
-    # and USER_GID in .devcontainer/Dockerfile to match your user if not 1000.
-    # user: node
 
+services:
+  app:
     build: 
       context: .
       dockerfile: Dockerfile
-    
+      args:
+        # [Choice] Node.js version: 14, 12, 10
+        VARIANT: 1.16
+        # [Choice] Install Node.js
+        INSTALL_NODE: "true"
+        NODE_VERSION: "lts/*"
+        # On Linux, you may need to update USER_UID and USER_GID below if not your local UID is not 1000.
+        USER_UID: 1000
+        USER_GID: 1000
+
     volumes:
-      - ..:/workspace
-      
+      - ..:/workspace:cached
+
     # Overrides default command so things don't shut down after the process ends.
     command: sleep infinity
 
-    links:
-      - redis
+    # Runs app on the same network as the database container, allows "forwardPorts" in devcontainer.json function.
+    network_mode: service:db
 
-  redis:
-    image: redis:alpine
-    hostname: redis
+    # Uncomment the next line to use a non-root user for all processes.
+    # user: node
+
+    # Use "forwardPorts" in **devcontainer.json** to forward an app port locally. 
+    # (Adding the "ports" property to this file will not forward from a Codespace.)
+
+  db:
+    image: redis:latest
+    restart: unless-stopped
+
+  rabbitmq:
+    image: rabbitmq:3.8-management
     ports:
-      - "6379"
+      - '5672:5672'
+      - '15672:15672'
