@@ -24,7 +24,7 @@ func connect(connection string) (*amqp.Connection, error) {
 
 func getAppPrefix() string {
 	path := common.GetOsEnvOrDefault("PATH_BASE", "/")
-	return path + "states"
+	return path
 }
 
 func main() {
@@ -35,7 +35,7 @@ func main() {
 	stateService := service.NewWarehouseStateService(stateRepository)
 	useCase := usecase.NewWarehouseStateUseCaseUseCase(stateRepository, stateService)
 	_ = useCase.SeedDatabase(ctx)
-	router.GET("/:catalogItemId", func(c *gin.Context) {
+	router.GET("/products/:catalogItemId", func(c *gin.Context) {
 		catalogItemId := c.Param("catalogItemId")
 		stock, err := useCase.GetAvailableCatalogItemQuantity(c.Request.Context(), catalogItemId)
 		if err != nil {
@@ -47,7 +47,7 @@ func main() {
 
 	})
 
-	router.GET("/", func(c *gin.Context) {
+	router.GET("/products", func(c *gin.Context) {
 		catalogItemIds := c.QueryArray("ids")
 		stocks, err := useCase.GetAvailableCatalogItemsQuantity(c.Request.Context(), catalogItemIds)
 		if err != nil {
@@ -58,5 +58,5 @@ func main() {
 		}
 
 	})
-	_ = r.Run("0.0.0.0:9000") // listen and serve on 0.0.0.0:8080
+	_ = r.Run() // listen and serve on 0.0.0.0:8080
 }

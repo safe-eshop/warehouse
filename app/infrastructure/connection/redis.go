@@ -9,7 +9,7 @@ import (
 )
 
 func getRedisConnectionString() string {
-	return common.GetOsEnvOrDefault("REDIS_CONNECTION", "localhost:6379")
+	return common.GetOsEnvOrDefault("REDIS_CONNECTION", "db:6379")
 }
 
 func NewRedisClient(context context.Context) *redis.Client {
