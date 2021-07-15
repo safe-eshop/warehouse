@@ -31,17 +31,16 @@ func getRedisKeys(ids []string) []string {
 	return res
 }
 
-func (r *redisWarehouseStateRepository) Count() (int64, error) {
-	result, err := r.redis.DBSize().Result()
+func (r *redisWarehouseStateRepository) Count(context context.Context) (int64, error) {
+	result, err := r.redis.DBSize(context).Result()
 	if err != nil {
 		return 0, nil
 	}
 	return result, nil
 }
 
-func (r *redisWarehouseStateRepository) InsertMany(states []*model.WarehouseState) error {
+func (r *redisWarehouseStateRepository) InsertMany(context context.Context, states []*model.WarehouseState) error {
 	pipeline := r.redis.Pipeline()
-	ctx := context.Background()
 	for _, state := range states {
 		key := getRedisKey(state.CatalogItemId)
 		redisVal, err := json.Marshal(model3.FromWarehouseState(*state))
@@ -49,12 +48,12 @@ func (r *redisWarehouseStateRepository) InsertMany(states []*model.WarehouseStat
 			return err
 		}
 
-		err = pipeline.Set(key, redisVal, 24*time.Hour).Err()
+		err = pipeline.Set(context, key, redisVal, 24*time.Hour).Err()
 		if err != nil {
 			return err
 		}
 	}
-	_, err := pipeline.ExecContext(ctx)
+	_, err := pipeline.Exec(context)
 	if err != nil {
 		return err
 	}
@@ -62,9 +61,9 @@ func (r *redisWarehouseStateRepository) InsertMany(states []*model.WarehouseStat
 	return nil
 }
 
-func (r *redisWarehouseStateRepository) FindById(id string) (*model.WarehouseState, error) {
+func (r *redisWarehouseStateRepository) FindById(context context.Context, id string) (*model.WarehouseState, error) {
 	redisKey := getRedisKey(id)
-	res, err := r.redis.Get(redisKey).Result()
+	res, err := r.redis.Get(context, redisKey).Result()
 	if err == redis.Nil {
 		return model.Zero(id), nil
 	} else if err != nil {
@@ -79,10 +78,10 @@ func (r *redisWarehouseStateRepository) FindById(id string) (*model.WarehouseSta
 	}
 }
 
-func (r *redisWarehouseStateRepository) FindByIds(ids []string) ([]*model.WarehouseState, error) {
+func (r *redisWarehouseStateRepository) FindByIds(context context.Context, ids []string) ([]*model.WarehouseState, error) {
 	redisKeys := getRedisKeys(ids)
 	result := make([]*model.WarehouseState, len(ids))
-	res, err := r.redis.MGet(redisKeys...).Result()
+	res, err := r.redis.MGet(context, redisKeys...).Result()
 	if err == redis.Nil {
 		for i, id := range ids {
 			result[i] = model.Zero(id)

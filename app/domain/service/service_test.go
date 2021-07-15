@@ -1,42 +1,46 @@
 package service
 
 import (
+	"context"
 	"errors"
-	"github.com/stretchr/testify/assert"
 	"testing"
 	"warehouse/app/domain/model"
 	"warehouse/app/domain/repository"
+
+	"github.com/stretchr/testify/assert"
 )
 
 type ErrorRepo struct {
 }
 
-func (r ErrorRepo) Count() (int64, error) {
+func (r ErrorRepo) Count(context context.Context) (int64, error) {
 	return 0, errors.New("Test")
 }
 
-func (r ErrorRepo) InsertMany(states []*model.WarehouseState) error {
+func (r ErrorRepo) InsertMany(context context.Context, states []*model.WarehouseState) error {
 	return errors.New("Test")
 }
 
-func (r ErrorRepo) FindById(id string) (*model.WarehouseState, error) {
+func (r ErrorRepo) FindById(context context.Context, id string) (*model.WarehouseState, error) {
 	return nil, repository.ErrNotFound
 }
 
-func (r ErrorRepo) FindByIds(ids []string) ([]*model.WarehouseState, error) {
+func (r ErrorRepo) FindByIds(context context.Context, ids []string) ([]*model.WarehouseState, error) {
 	return nil, repository.ErrNotFound
 }
 
 func TestFindAvailableQuantityWhenRepositoryReturnError(t *testing.T) {
+	ctx := context.TODO()
 	service := WarehouseStateService{ErrorRepo{}}
-	_, err := service.GetAvailableCatalogItemQuantity("")
+	_, err := service.GetAvailableCatalogItemQuantity(ctx, "")
 	assert.Error(t, err)
 	assert.Equal(t, err, repository.ErrNotFound, "")
 }
 
 func TestFindAvailableQuantitiesWhenRepositoryReturnError(t *testing.T) {
+	ctx := context.TODO()
 	service := WarehouseStateService{ErrorRepo{}}
-	_, err := service.GetAvailableCatalogItemsQuantity([]string{"a", "b"})
+	_, err := service.GetAvailableCatalogItemsQuantity(ctx, []string{"a", "b"})
 	assert.Error(t, err)
 	assert.Equal(t, err, repository.ErrNotFound, "")
 }
@@ -44,19 +48,19 @@ func TestFindAvailableQuantitiesWhenRepositoryReturnError(t *testing.T) {
 type OkRepo struct {
 }
 
-func (r OkRepo) Count() (int64, error) {
+func (r OkRepo) Count(context context.Context) (int64, error) {
 	return 0, nil
 }
 
-func (r OkRepo) InsertMany(states []*model.WarehouseState) error {
+func (r OkRepo) InsertMany(context context.Context, states []*model.WarehouseState) error {
 	return nil
 }
 
-func (r OkRepo) FindById(id string) (*model.WarehouseState, error) {
+func (r OkRepo) FindById(context context.Context, id string) (*model.WarehouseState, error) {
 	return model.NewWarehouseState(id, 10, 1), nil
 }
 
-func (r OkRepo) FindByIds(ids []string) ([]*model.WarehouseState, error) {
+func (r OkRepo) FindByIds(context context.Context, ids []string) ([]*model.WarehouseState, error) {
 	res := make([]*model.WarehouseState, len(ids))
 	for i, id := range ids {
 		res[i] = model.NewWarehouseState(id, 10, 1)
@@ -66,7 +70,8 @@ func (r OkRepo) FindByIds(ids []string) ([]*model.WarehouseState, error) {
 
 func TestFindAvailableQuantity(t *testing.T) {
 	service := WarehouseStateService{OkRepo{}}
-	subject, err := service.GetAvailableCatalogItemQuantity("test")
+	ctx := context.TODO()
+	subject, err := service.GetAvailableCatalogItemQuantity(ctx, "test")
 	assert.Nil(t, err)
 	assert.Equal(t, 9, subject.AvailableQuantity)
 	assert.Equal(t, "test", subject.Id)
@@ -74,7 +79,8 @@ func TestFindAvailableQuantity(t *testing.T) {
 
 func TestFindAvailableQuantities(t *testing.T) {
 	service := WarehouseStateService{OkRepo{}}
-	subject, err := service.GetAvailableCatalogItemsQuantity([]string{"a", "b"})
+	ctx := context.TODO()
+	subject, err := service.GetAvailableCatalogItemsQuantity(ctx, []string{"a", "b"})
 	assert.Nil(t, err)
 	for _, res := range subject {
 		assert.Equal(t, 9, res.AvailableQuantity)

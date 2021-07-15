@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"warehouse/app/domain/dto"
 	"warehouse/app/domain/repository"
 )
@@ -13,16 +14,16 @@ func NewWarehouseStateService(repo repository.WarehouseStateRepository) *Warehou
 	return &WarehouseStateService{repo: repo}
 }
 
-func (s *WarehouseStateService) GetAvailableCatalogItemQuantity(id string) (*dto.AvailableQuantity, error) {
-	state, err := s.repo.FindById(id)
+func (s *WarehouseStateService) GetAvailableCatalogItemQuantity(context context.Context, id string) (*dto.AvailableQuantity, error) {
+	state, err := s.repo.FindById(context, id)
 	if err != nil {
 		return dto.NewAvailableQuantity(id, 0), err
 	}
 	return dto.FromWarehouseState(*state), nil
 }
 
-func (s *WarehouseStateService) GetAvailableCatalogItemsQuantity(ids []string) ([]*dto.AvailableQuantity, error) {
-	state, err := s.repo.FindByIds(ids)
+func (s *WarehouseStateService) GetAvailableCatalogItemsQuantity(context context.Context, ids []string) ([]*dto.AvailableQuantity, error) {
+	state, err := s.repo.FindByIds(context, ids)
 	if err != nil {
 		return nil, err
 	}

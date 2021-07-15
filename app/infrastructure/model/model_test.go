@@ -1,9 +1,10 @@
 package model
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
 	model2 "warehouse/app/domain/model"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestToWarehouseState(t *testing.T) {

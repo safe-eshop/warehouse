@@ -1,8 +1,7 @@
 package main
 
 import (
-	"github.com/gin-gonic/gin"
-	"github.com/streadway/amqp"
+	"context"
 	"log"
 	"net/http"
 	"warehouse/app/application/usecase"
@@ -10,6 +9,9 @@ import (
 	"warehouse/app/domain/service"
 	"warehouse/app/infrastructure/connection"
 	"warehouse/app/infrastructure/repository"
+
+	"github.com/gin-gonic/gin"
+	"github.com/streadway/amqp"
 )
 
 func connect(connection string) (*amqp.Connection, error) {
@@ -26,15 +28,16 @@ func getAppPrefix() string {
 }
 
 func main() {
+	ctx := context.TODO()
 	r := gin.Default()
 	router := r.Group(getAppPrefix())
-	stateRepository := repository.NewWarehouseStateRepository(connection.NewRedisClient())
+	stateRepository := repository.NewWarehouseStateRepository(connection.NewRedisClient(ctx))
 	stateService := service.NewWarehouseStateService(stateRepository)
 	useCase := usecase.NewWarehouseStateUseCaseUseCase(stateRepository, stateService)
-	_ = useCase.SeedDatabase()
+	_ = useCase.SeedDatabase(ctx)
 	router.GET("/:catalogItemId", func(c *gin.Context) {
 		catalogItemId := c.Param("catalogItemId")
-		stock, err := useCase.GetAvailableCatalogItemQuantity(catalogItemId)
+		stock, err := useCase.GetAvailableCatalogItemQuantity(c.Request.Context(), catalogItemId)
 		if err != nil {
 			log.Println(err)
 			c.String(http.StatusInternalServerError, "unknown error")
@@ -46,7 +49,7 @@ func main() {
 
 	router.GET("/", func(c *gin.Context) {
 		catalogItemIds := c.QueryArray("ids")
-		stocks, err := useCase.GetAvailableCatalogItemsQuantity(catalogItemIds)
+		stocks, err := useCase.GetAvailableCatalogItemsQuantity(c.Request.Context(), catalogItemIds)
 		if err != nil {
 			log.Println(err)
 			c.String(http.StatusInternalServerError, "unknown error")
