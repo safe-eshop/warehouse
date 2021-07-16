@@ -2,9 +2,9 @@ package main
 
 import (
 	"context"
-	"log"
 	"net/http"
 	"strconv"
+	"warehouse/app/api/logging"
 	"warehouse/app/application/usecase"
 	"warehouse/app/common"
 	"warehouse/app/domain/service"
@@ -12,6 +12,7 @@ import (
 	"warehouse/app/infrastructure/repository"
 
 	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 	"github.com/streadway/amqp"
 )
 
@@ -37,9 +38,17 @@ func getAppPrefix() string {
 	return path
 }
 
+func NewLogger() *logrus.Logger {
+	var logger = logrus.New()
+	logger.Formatter = &logrus.JSONFormatter{}
+	return logger
+}
+
 func main() {
 	ctx := context.TODO()
-	r := gin.Default()
+	log := NewLogger()
+	r := gin.New()
+	r.Use(logging.Logger(log), gin.Recovery())
 	router := r.Group(getAppPrefix())
 	stateRepository := repository.NewWarehouseStateRepository(connection.NewRedisClient(ctx))
 	stateService := service.NewWarehouseStateService(stateRepository)
