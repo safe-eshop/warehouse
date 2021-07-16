@@ -1,12 +1,13 @@
 package model
 
+type ProductId = int
 type WarehouseState struct {
-	CatalogItemId string `json:"catalogItemId,omitempty"`
-	ShopQuantity  int    `json:"quantity,omitempty"`
-	Reservation   int    `json:"reservation,omitempty"`
+	CatalogItemId ProductId `json:"catalogItemId,omitempty"`
+	ShopQuantity  int       `json:"quantity,omitempty"`
+	Reservation   int       `json:"reservation,omitempty"`
 }
 
-func NewWarehouseState(id string, quantity, reservation int) *WarehouseState {
+func NewWarehouseState(id ProductId, quantity, reservation int) *WarehouseState {
 	return &WarehouseState{
 		CatalogItemId: id,
 		ShopQuantity:  quantity,
@@ -14,7 +15,7 @@ func NewWarehouseState(id string, quantity, reservation int) *WarehouseState {
 	}
 }
 
-func Zero(id string) *WarehouseState {
+func Zero(id ProductId) *WarehouseState {
 	return &WarehouseState{
 		CatalogItemId: id,
 		ShopQuantity:  0,
@@ -22,7 +23,7 @@ func Zero(id string) *WarehouseState {
 	}
 }
 
-func (w *WarehouseState) GetID() string {
+func (w *WarehouseState) GetID() ProductId {
 	return w.CatalogItemId
 }
 

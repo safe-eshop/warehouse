@@ -21,18 +21,18 @@ func (r ErrorRepo) InsertMany(context context.Context, states []*model.Warehouse
 	return errors.New("Test")
 }
 
-func (r ErrorRepo) FindById(context context.Context, id string) (*model.WarehouseState, error) {
+func (r ErrorRepo) FindById(context context.Context, id model.ProductId) (*model.WarehouseState, error) {
 	return nil, repository.ErrNotFound
 }
 
-func (r ErrorRepo) FindByIds(context context.Context, ids []string) ([]*model.WarehouseState, error) {
+func (r ErrorRepo) FindByIds(context context.Context, ids []model.ProductId) ([]*model.WarehouseState, error) {
 	return nil, repository.ErrNotFound
 }
 
 func TestFindAvailableQuantityWhenRepositoryReturnError(t *testing.T) {
 	ctx := context.TODO()
 	service := WarehouseStateService{ErrorRepo{}}
-	_, err := service.GetAvailableCatalogItemQuantity(ctx, "")
+	_, err := service.GetAvailableCatalogItemQuantity(ctx, 1)
 	assert.Error(t, err)
 	assert.Equal(t, err, repository.ErrNotFound, "")
 }
@@ -40,7 +40,7 @@ func TestFindAvailableQuantityWhenRepositoryReturnError(t *testing.T) {
 func TestFindAvailableQuantitiesWhenRepositoryReturnError(t *testing.T) {
 	ctx := context.TODO()
 	service := WarehouseStateService{ErrorRepo{}}
-	_, err := service.GetAvailableCatalogItemsQuantity(ctx, []string{"a", "b"})
+	_, err := service.GetAvailableCatalogItemsQuantity(ctx, []int{1, 2})
 	assert.Error(t, err)
 	assert.Equal(t, err, repository.ErrNotFound, "")
 }
@@ -56,11 +56,11 @@ func (r OkRepo) InsertMany(context context.Context, states []*model.WarehouseSta
 	return nil
 }
 
-func (r OkRepo) FindById(context context.Context, id string) (*model.WarehouseState, error) {
+func (r OkRepo) FindById(context context.Context, id model.ProductId) (*model.WarehouseState, error) {
 	return model.NewWarehouseState(id, 10, 1), nil
 }
 
-func (r OkRepo) FindByIds(context context.Context, ids []string) ([]*model.WarehouseState, error) {
+func (r OkRepo) FindByIds(context context.Context, ids []model.ProductId) ([]*model.WarehouseState, error) {
 	res := make([]*model.WarehouseState, len(ids))
 	for i, id := range ids {
 		res[i] = model.NewWarehouseState(id, 10, 1)
@@ -71,16 +71,16 @@ func (r OkRepo) FindByIds(context context.Context, ids []string) ([]*model.Wareh
 func TestFindAvailableQuantity(t *testing.T) {
 	service := WarehouseStateService{OkRepo{}}
 	ctx := context.TODO()
-	subject, err := service.GetAvailableCatalogItemQuantity(ctx, "test")
+	subject, err := service.GetAvailableCatalogItemQuantity(ctx, 1)
 	assert.Nil(t, err)
 	assert.Equal(t, 9, subject.AvailableQuantity)
-	assert.Equal(t, "test", subject.Id)
+	assert.Equal(t, 1, subject.Id)
 }
 
 func TestFindAvailableQuantities(t *testing.T) {
 	service := WarehouseStateService{OkRepo{}}
 	ctx := context.TODO()
-	subject, err := service.GetAvailableCatalogItemsQuantity(ctx, []string{"a", "b"})
+	subject, err := service.GetAvailableCatalogItemsQuantity(ctx, []int{1, 2})
 	assert.Nil(t, err)
 	for _, res := range subject {
 		assert.Equal(t, 9, res.AvailableQuantity)

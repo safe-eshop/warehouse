@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"net/http"
+	"strconv"
 	"warehouse/app/application/usecase"
 	"warehouse/app/common"
 	"warehouse/app/domain/service"
@@ -13,6 +14,15 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/streadway/amqp"
 )
+
+func parseInt(idsStr []string) []int {
+	res := make([]int, len(idsStr))
+	for i, v := range idsStr {
+		id, _ := strconv.Atoi(v)
+		res[i] = id
+	}
+	return res
+}
 
 func connect(connection string) (*amqp.Connection, error) {
 	conn, err := amqp.Dial(connection)
@@ -37,7 +47,14 @@ func main() {
 	_ = useCase.SeedDatabase(ctx)
 	router.GET("/products/:catalogItemId", func(c *gin.Context) {
 		catalogItemId := c.Param("catalogItemId")
-		stock, err := useCase.GetAvailableCatalogItemQuantity(c.Request.Context(), catalogItemId)
+		id, err := strconv.Atoi(catalogItemId)
+
+		if err != nil {
+			c.Error(err)
+			c.String(http.StatusBadRequest, "bad request")
+			return
+		}
+		stock, err := useCase.GetAvailableCatalogItemQuantity(c.Request.Context(), id)
 		if err != nil {
 			log.Println(err)
 			c.String(http.StatusInternalServerError, "unknown error")
@@ -49,7 +66,8 @@ func main() {
 
 	router.GET("/products", func(c *gin.Context) {
 		catalogItemIds := c.QueryArray("ids")
-		stocks, err := useCase.GetAvailableCatalogItemsQuantity(c.Request.Context(), catalogItemIds)
+		ids := parseInt(catalogItemIds)
+		stocks, err := useCase.GetAvailableCatalogItemsQuantity(c.Request.Context(), ids)
 		if err != nil {
 			log.Println(err)
 			c.String(http.StatusInternalServerError, "unknown error")

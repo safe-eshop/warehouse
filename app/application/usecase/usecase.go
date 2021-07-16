@@ -2,7 +2,6 @@ package usecase
 
 import (
 	"context"
-	"fmt"
 	"warehouse/app/domain/dto"
 	"warehouse/app/domain/model"
 	"warehouse/app/domain/repository"
@@ -12,8 +11,8 @@ import (
 )
 
 type WarehouseStateUseCase interface {
-	GetAvailableCatalogItemQuantity(id string) (*dto.AvailableQuantity, error)
-	GetAvailableCatalogItemsQuantity(ids []string) ([]*dto.AvailableQuantity, error)
+	GetAvailableCatalogItemQuantity(id model.ProductId) (*dto.AvailableQuantity, error)
+	GetAvailableCatalogItemsQuantity(ids []model.ProductId) ([]*dto.AvailableQuantity, error)
 	SeedDatabase() error
 }
 
@@ -29,11 +28,11 @@ func NewWarehouseStateUseCaseUseCase(repo repository.WarehouseStateRepository, s
 	}
 }
 
-func (u *warehouseStateUseCase) GetAvailableCatalogItemQuantity(ctx context.Context, id string) (*dto.AvailableQuantity, error) {
+func (u *warehouseStateUseCase) GetAvailableCatalogItemQuantity(ctx context.Context, id model.ProductId) (*dto.AvailableQuantity, error) {
 	return u.service.GetAvailableCatalogItemQuantity(ctx, id)
 }
 
-func (u *warehouseStateUseCase) GetAvailableCatalogItemsQuantity(ctx context.Context, ids []string) ([]*dto.AvailableQuantity, error) {
+func (u *warehouseStateUseCase) GetAvailableCatalogItemsQuantity(ctx context.Context, ids []model.ProductId) ([]*dto.AvailableQuantity, error) {
 	return u.service.GetAvailableCatalogItemsQuantity(ctx, ids)
 }
 
@@ -50,7 +49,7 @@ func (u *warehouseStateUseCase) SeedDatabase(ctx context.Context) error {
 	result := make([]*model.WarehouseState, count)
 	gofakeit.Seed(0)
 	for i := 0; i < count; i++ {
-		result[i] = model.NewWarehouseState(fmt.Sprint(gofakeit.UUID()), gofakeit.Number(0, 1000), gofakeit.Number(0, 1000))
+		result[i] = model.NewWarehouseState(i, gofakeit.Number(0, 1000), gofakeit.Number(0, 1000))
 	}
 	err = u.repo.InsertMany(ctx, result)
 	return err

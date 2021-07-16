@@ -3,11 +3,11 @@ package dto
 import "warehouse/app/domain/model"
 
 type AvailableQuantity struct {
-	Id                string `json:"id,omitempty"`
-	AvailableQuantity int    `json:"availableQuantity,omitempty"`
+	Id                model.ProductId `json:"id,omitempty"`
+	AvailableQuantity int             `json:"availableQuantity,omitempty"`
 }
 
-func NewAvailableQuantity(id string, availableQuantity int) *AvailableQuantity {
+func NewAvailableQuantity(id model.ProductId, availableQuantity int) *AvailableQuantity {
 	return &AvailableQuantity{Id: id, AvailableQuantity: availableQuantity}
 }
 

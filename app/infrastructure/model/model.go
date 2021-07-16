@@ -3,12 +3,12 @@ package model
 import "warehouse/app/domain/model"
 
 type RedisWarehouseState struct {
-	CatalogItemId string `json:"catalogItemId,omitempty"`
-	ShopQuantity  int    `json:"quantity,omitempty"`
-	Reservation   int    `json:"reservation,omitempty"`
+	CatalogItemId model.ProductId `json:"catalogItemId,omitempty"`
+	ShopQuantity  int             `json:"quantity,omitempty"`
+	Reservation   int             `json:"reservation,omitempty"`
 }
 
-func NewWarehouseState(id string, quantity, reservation int) *RedisWarehouseState {
+func NewWarehouseState(id model.ProductId, quantity, reservation int) *RedisWarehouseState {
 	return &RedisWarehouseState{
 		CatalogItemId: id,
 		ShopQuantity:  quantity,
