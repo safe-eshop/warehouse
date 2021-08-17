@@ -1,26 +1,27 @@
 package dto
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
 	"warehouse/app/domain/model"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestNewAvailableQuantity(t *testing.T) {
-	subject := NewAvailableQuantity("a", 2)
-	assert.Equal(t, subject.Id, "a", "they should be equal")
+	subject := NewAvailableQuantity(1, 2)
+	assert.Equal(t, subject.Id, 1, "they should be equal")
 	assert.Equal(t, subject.AvailableQuantity, 2, "they should be equal")
 }
 
 func TestFromWarehouseState(t *testing.T) {
-	state := model.NewWarehouseState("a", 5, 3)
+	state := model.NewWarehouseState(1, 5, 3)
 	subject := FromWarehouseState(*state)
-	assert.Equal(t, subject.Id, "a", "they should be equal")
+	assert.Equal(t, subject.Id, 1, "they should be equal")
 	assert.Equal(t, subject.AvailableQuantity, 2, "they should be equal")
 }
 
 func TestFromWarehouseStates(t *testing.T) {
-	states := []*model.WarehouseState{model.NewWarehouseState("a", 5, 3), model.NewWarehouseState("b", 7, 3)}
+	states := []*model.WarehouseState{model.NewWarehouseState(1, 5, 3), model.NewWarehouseState(2, 7, 3)}
 	subject := FromWarehouseStates(states)
 	for i, state := range states {
 

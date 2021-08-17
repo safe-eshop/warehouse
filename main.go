@@ -2,8 +2,9 @@ package main
 
 import (
 	"context"
-	"log"
 	"net/http"
+	"strconv"
+	"warehouse/app/api/logging"
 	"warehouse/app/application/usecase"
 	"warehouse/app/common"
 	"warehouse/app/domain/service"
@@ -11,8 +12,18 @@ import (
 	"warehouse/app/infrastructure/repository"
 
 	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 	"github.com/streadway/amqp"
 )
+
+func parseInt(idsStr []string) []int {
+	res := make([]int, len(idsStr))
+	for i, v := range idsStr {
+		id, _ := strconv.Atoi(v)
+		res[i] = id
+	}
+	return res
+}
 
 func connect(connection string) (*amqp.Connection, error) {
 	conn, err := amqp.Dial(connection)
@@ -27,9 +38,17 @@ func getAppPrefix() string {
 	return path
 }
 
+func NewLogger() *logrus.Logger {
+	var logger = logrus.New()
+	logger.Formatter = &logrus.JSONFormatter{}
+	return logger
+}
+
 func main() {
 	ctx := context.TODO()
-	r := gin.Default()
+	log := NewLogger()
+	r := gin.New()
+	r.Use(logging.Logger(log), gin.Recovery())
 	router := r.Group(getAppPrefix())
 	stateRepository := repository.NewWarehouseStateRepository(connection.NewRedisClient(ctx))
 	stateService := service.NewWarehouseStateService(stateRepository)
@@ -37,7 +56,14 @@ func main() {
 	_ = useCase.SeedDatabase(ctx)
 	router.GET("/products/:catalogItemId", func(c *gin.Context) {
 		catalogItemId := c.Param("catalogItemId")
-		stock, err := useCase.GetAvailableCatalogItemQuantity(c.Request.Context(), catalogItemId)
+		id, err := strconv.Atoi(catalogItemId)
+
+		if err != nil {
+			c.Error(err)
+			c.String(http.StatusBadRequest, "bad request")
+			return
+		}
+		stock, err := useCase.GetAvailableCatalogItemQuantity(c.Request.Context(), id)
 		if err != nil {
 			log.Println(err)
 			c.String(http.StatusInternalServerError, "unknown error")
@@ -49,7 +75,8 @@ func main() {
 
 	router.GET("/products", func(c *gin.Context) {
 		catalogItemIds := c.QueryArray("ids")
-		stocks, err := useCase.GetAvailableCatalogItemsQuantity(c.Request.Context(), catalogItemIds)
+		ids := parseInt(catalogItemIds)
+		stocks, err := useCase.GetAvailableCatalogItemsQuantity(c.Request.Context(), ids)
 		if err != nil {
 			log.Println(err)
 			c.String(http.StatusInternalServerError, "unknown error")
