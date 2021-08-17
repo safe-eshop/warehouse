@@ -1,4 +1,4 @@
-FROM golang:1.13 AS builder
+FROM golang:1.16 AS builder
 ADD . /app/backend
 WORKDIR /app/backend
 RUN go test ./...
