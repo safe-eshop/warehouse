@@ -11,8 +11,8 @@ import (
 )
 
 type WarehouseStateUseCase interface {
-	GetAvailableCatalogItemQuantity(id model.ProductId) (*dto.AvailableQuantity, error)
-	GetAvailableCatalogItemsQuantity(ids []model.ProductId) ([]*dto.AvailableQuantity, error)
+	GetAvailableCatalogItemQuantity(id model.CatalogItemId) (*dto.AvailableQuantity, error)
+	GetAvailableCatalogItemsQuantity(ids []model.CatalogItemId) ([]*dto.AvailableQuantity, error)
 	SeedDatabase() error
 }
 
@@ -28,11 +28,11 @@ func NewWarehouseStateUseCaseUseCase(repo repository.WarehouseStateRepository, s
 	}
 }
 
-func (u *warehouseStateUseCase) GetAvailableCatalogItemQuantity(ctx context.Context, id model.ProductId) (*dto.AvailableQuantity, error) {
+func (u *warehouseStateUseCase) GetAvailableCatalogItemQuantity(ctx context.Context, id model.CatalogItemId) (*dto.AvailableQuantity, error) {
 	return u.service.GetAvailableCatalogItemQuantity(ctx, id)
 }
 
-func (u *warehouseStateUseCase) GetAvailableCatalogItemsQuantity(ctx context.Context, ids []model.ProductId) ([]*dto.AvailableQuantity, error) {
+func (u *warehouseStateUseCase) GetAvailableCatalogItemsQuantity(ctx context.Context, ids []model.CatalogItemId) ([]*dto.AvailableQuantity, error) {
 	return u.service.GetAvailableCatalogItemsQuantity(ctx, ids)
 }
 

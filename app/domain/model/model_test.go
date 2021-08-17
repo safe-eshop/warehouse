@@ -8,7 +8,7 @@ import (
 
 func TestNewWarehouseState(t *testing.T) {
 	subject := NewWarehouseState(1, 1, 3)
-	assert.Equal(t, subject.GetID(), "a", "they should be equal")
+	assert.Equal(t, subject.GetID(), 1, "they should be equal")
 	assert.Equal(t, subject.ShopQuantity, 1, "they should be equal")
 	assert.Equal(t, subject.Reservation, 3, "they should be equal")
 }

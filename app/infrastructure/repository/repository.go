@@ -19,11 +19,11 @@ func NewWarehouseStateRepository(redis *redis.Client) *redisWarehouseStateReposi
 	return &redisWarehouseStateRepository{redis: redis}
 }
 
-func getRedisKey(id model.ProductId) string {
+func getRedisKey(id model.CatalogItemId) string {
 	return fmt.Sprintf("{warehouse/%d}", id)
 }
 
-func getRedisKeys(ids []model.ProductId) []string {
+func getRedisKeys(ids []model.CatalogItemId) []string {
 	res := make([]string, len(ids))
 	for i, id := range ids {
 		res[i] = getRedisKey(id)
@@ -61,7 +61,7 @@ func (r *redisWarehouseStateRepository) InsertMany(context context.Context, stat
 	return nil
 }
 
-func (r *redisWarehouseStateRepository) FindById(context context.Context, id model.ProductId) (*model.WarehouseState, error) {
+func (r *redisWarehouseStateRepository) FindById(context context.Context, id model.CatalogItemId) (*model.WarehouseState, error) {
 	redisKey := getRedisKey(id)
 	res, err := r.redis.Get(context, redisKey).Result()
 	if err == redis.Nil {
@@ -78,7 +78,7 @@ func (r *redisWarehouseStateRepository) FindById(context context.Context, id mod
 	}
 }
 
-func (r *redisWarehouseStateRepository) FindByIds(context context.Context, ids []model.ProductId) ([]*model.WarehouseState, error) {
+func (r *redisWarehouseStateRepository) FindByIds(context context.Context, ids []model.CatalogItemId) ([]*model.WarehouseState, error) {
 	redisKeys := getRedisKeys(ids)
 	result := make([]*model.WarehouseState, len(ids))
 	res, err := r.redis.MGet(context, redisKeys...).Result()

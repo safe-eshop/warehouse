@@ -54,6 +54,13 @@ func main() {
 	stateService := service.NewWarehouseStateService(stateRepository)
 	useCase := usecase.NewWarehouseStateUseCaseUseCase(stateRepository, stateService)
 	_ = useCase.SeedDatabase(ctx)
+
+	router.GET("/ping", func(c *gin.Context) {
+		c.JSON(200, gin.H{
+			"message": "pong",
+		})
+	})
+
 	router.GET("/products/:catalogItemId", func(c *gin.Context) {
 		catalogItemId := c.Param("catalogItemId")
 		id, err := strconv.Atoi(catalogItemId)

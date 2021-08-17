@@ -15,7 +15,7 @@ func NewWarehouseStateService(repo repository.WarehouseStateRepository) *Warehou
 	return &WarehouseStateService{repo: repo}
 }
 
-func (s *WarehouseStateService) GetAvailableCatalogItemQuantity(context context.Context, id model.ProductId) (*dto.AvailableQuantity, error) {
+func (s *WarehouseStateService) GetAvailableCatalogItemQuantity(context context.Context, id model.CatalogItemId) (*dto.AvailableQuantity, error) {
 	state, err := s.repo.FindById(context, id)
 	if err != nil {
 		return dto.NewAvailableQuantity(id, 0), err
@@ -23,7 +23,7 @@ func (s *WarehouseStateService) GetAvailableCatalogItemQuantity(context context.
 	return dto.FromWarehouseState(*state), nil
 }
 
-func (s *WarehouseStateService) GetAvailableCatalogItemsQuantity(context context.Context, ids []model.ProductId) ([]*dto.AvailableQuantity, error) {
+func (s *WarehouseStateService) GetAvailableCatalogItemsQuantity(context context.Context, ids []model.CatalogItemId) ([]*dto.AvailableQuantity, error) {
 	state, err := s.repo.FindByIds(context, ids)
 	if err != nil {
 		return nil, err

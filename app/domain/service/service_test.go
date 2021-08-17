@@ -21,11 +21,11 @@ func (r ErrorRepo) InsertMany(context context.Context, states []*model.Warehouse
 	return errors.New("Test")
 }
 
-func (r ErrorRepo) FindById(context context.Context, id model.ProductId) (*model.WarehouseState, error) {
+func (r ErrorRepo) FindById(context context.Context, id model.CatalogItemId) (*model.WarehouseState, error) {
 	return nil, repository.ErrNotFound
 }
 
-func (r ErrorRepo) FindByIds(context context.Context, ids []model.ProductId) ([]*model.WarehouseState, error) {
+func (r ErrorRepo) FindByIds(context context.Context, ids []model.CatalogItemId) ([]*model.WarehouseState, error) {
 	return nil, repository.ErrNotFound
 }
 
@@ -56,11 +56,11 @@ func (r OkRepo) InsertMany(context context.Context, states []*model.WarehouseSta
 	return nil
 }
 
-func (r OkRepo) FindById(context context.Context, id model.ProductId) (*model.WarehouseState, error) {
+func (r OkRepo) FindById(context context.Context, id model.CatalogItemId) (*model.WarehouseState, error) {
 	return model.NewWarehouseState(id, 10, 1), nil
 }
 
-func (r OkRepo) FindByIds(context context.Context, ids []model.ProductId) ([]*model.WarehouseState, error) {
+func (r OkRepo) FindByIds(context context.Context, ids []model.CatalogItemId) ([]*model.WarehouseState, error) {
 	res := make([]*model.WarehouseState, len(ids))
 	for i, id := range ids {
 		res[i] = model.NewWarehouseState(id, 10, 1)
