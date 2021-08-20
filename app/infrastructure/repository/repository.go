@@ -61,6 +61,19 @@ func (r *redisWarehouseStateRepository) InsertMany(context context.Context, stat
 	return nil
 }
 
+func (r *redisWarehouseStateRepository) Insert(context context.Context, state *model.WarehouseState) error {
+	key := getRedisKey(state.CatalogItemId)
+	redisVal, err := json.Marshal(model3.FromWarehouseState(*state))
+	if err != nil {
+		return err
+	}
+	err = r.redis.Set(context, key, redisVal, 24*time.Hour).Err()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (r *redisWarehouseStateRepository) FindById(context context.Context, id model.CatalogItemId) (*model.WarehouseState, error) {
 	redisKey := getRedisKey(id)
 	res, err := r.redis.Get(context, redisKey).Result()

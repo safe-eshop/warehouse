@@ -29,6 +29,10 @@ func (r ErrorRepo) FindByIds(context context.Context, ids []model.CatalogItemId)
 	return nil, repository.ErrNotFound
 }
 
+func (r ErrorRepo) Insert(context context.Context, states *model.WarehouseState) error {
+	return nil
+}
+
 func TestFindAvailableQuantityWhenRepositoryReturnError(t *testing.T) {
 	ctx := context.TODO()
 	service := WarehouseStateService{ErrorRepo{}}
@@ -66,6 +70,10 @@ func (r OkRepo) FindByIds(context context.Context, ids []model.CatalogItemId) ([
 		res[i] = model.NewWarehouseState(id, 10, 1)
 	}
 	return res, nil
+}
+
+func (r OkRepo) Insert(context context.Context, states *model.WarehouseState) error {
+	return nil
 }
 
 func TestFindAvailableQuantity(t *testing.T) {
