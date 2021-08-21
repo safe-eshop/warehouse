@@ -5,10 +5,13 @@ import (
 	"net/http"
 	"strconv"
 	"warehouse/app/api/logging"
+	"warehouse/app/application/bus"
 	"warehouse/app/application/usecase"
 	"warehouse/app/common"
 	"warehouse/app/domain/service"
+	ibus "warehouse/app/infrastructure/bus"
 	"warehouse/app/infrastructure/connection"
+	"warehouse/app/infrastructure/rabbitmq"
 	"warehouse/app/infrastructure/repository"
 
 	"github.com/gin-gonic/gin"
@@ -45,16 +48,21 @@ func NewLogger() *logrus.Logger {
 }
 
 func main() {
-	ctx := context.TODO()
+	ctx := context.Background()
 	log := NewLogger()
 	r := gin.New()
 	r.Use(logging.Logger(log), gin.Recovery())
 	router := r.Group(getAppPrefix())
+	rClient, err := rabbitmq.NewRabbitMqClient(common.GetOsEnvOrDefault("RABBITMQ_CONNECTION", "amqp://guest:guest@rabbitmq:5672/"))
+	if err != nil {
+		log.WithError(err).Fatal("Cannot connect to rabbitmq")
+	}
+	defer rClient.Close()
 	stateRepository := repository.NewWarehouseStateRepository(connection.NewRedisClient(ctx))
 	stateService := service.NewWarehouseStateService(stateRepository)
 	useCase := usecase.NewWarehouseStateUseCaseUseCase(stateRepository, stateService)
-	_ = useCase.SeedDatabase(ctx)
-
+	subscriber := ibus.NewRabbitMqMessageSubscriber(rClient, common.GetOsEnvOrDefault("RABBITMQ_EXCHANGE", "catalog"), common.GetOsEnvOrDefault("RABBITMQ_QUEUE", "warehouse"), common.GetOsEnvOrDefault("RABBITMQ_TOPIC", "products"))
+	go bus.HandleProductCreated(ctx, subscriber, stateRepository)
 	router.GET("/ping", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"message": "pong",
