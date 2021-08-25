@@ -4,7 +4,7 @@ import "os"
 
 func GetOsEnvOrDefault(envVar, defaultVal string) string {
 	result := os.Getenv(envVar)
-	if result != "" {
+	if result == "" {
 		return defaultVal
 	}
 	return result
