@@ -2,10 +2,10 @@ package connection
 
 import (
 	"context"
-	"log"
 	"warehouse/app/common"
 
 	"github.com/go-redis/redis/v8"
+	log "github.com/sirupsen/logrus"
 )
 
 func getRedisConnectionString() string {
@@ -13,15 +13,16 @@ func getRedisConnectionString() string {
 }
 
 func NewRedisClient(context context.Context) *redis.Client {
+	redis_conn := getRedisConnectionString()
 	client := redis.NewClient(&redis.Options{
-		Addr:     getRedisConnectionString(),
+		Addr:     redis_conn,
 		Password: "", // no password set
 		DB:       0,  // use default DB
 	})
 
 	_, err := client.Ping(context).Result()
 	if err != nil {
-		log.Fatal(err)
+		log.WithField("redisConnection", redis_conn).WithContext(context).WithError(err).Fatal("Redis connection error")
 	}
 	return client
 }

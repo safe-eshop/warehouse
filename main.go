@@ -15,7 +15,7 @@ import (
 	"warehouse/app/infrastructure/repository"
 
 	"github.com/gin-gonic/gin"
-	"github.com/sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 	"github.com/streadway/amqp"
 )
 
@@ -41,9 +41,10 @@ func getAppPrefix() string {
 	return path
 }
 
-func NewLogger() *logrus.Logger {
-	var logger = logrus.New()
-	logger.Formatter = &logrus.JSONFormatter{}
+func NewLogger() *log.Logger {
+	log.SetFormatter(&log.JSONFormatter{})
+	var logger = log.New()
+	logger.Formatter = &log.JSONFormatter{}
 	return logger
 }
 
