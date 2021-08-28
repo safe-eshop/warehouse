@@ -2,8 +2,8 @@ package main
 
 import (
 	"context"
-	"net/http"
 	"strconv"
+	"warehouse/app/api/handlers"
 	"warehouse/app/api/logging"
 	"warehouse/app/application/bus"
 	"warehouse/app/application/usecase"
@@ -63,43 +63,13 @@ func main() {
 	stateService := service.NewWarehouseStateService(stateRepository)
 	useCase := usecase.NewWarehouseStateUseCaseUseCase(stateRepository, stateService)
 	subscriber := ibus.NewRabbitMqMessageSubscriber(rClient, common.GetOsEnvOrDefault("RABBITMQ_EXCHANGE", "catalog"), common.GetOsEnvOrDefault("RABBITMQ_QUEUE", "warehouse"), common.GetOsEnvOrDefault("RABBITMQ_TOPIC", "products"))
+	api := handlers.NewWarehouseApi(router, useCase)
 	go bus.HandleProductCreated(ctx, subscriber, stateRepository)
 	router.GET("/ping", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"message": "pong",
 		})
 	})
-
-	router.GET("/products/:catalogItemId", func(c *gin.Context) {
-		catalogItemId := c.Param("catalogItemId")
-		id, err := strconv.Atoi(catalogItemId)
-
-		if err != nil {
-			c.Error(err)
-			c.String(http.StatusBadRequest, "bad request")
-			return
-		}
-		stock, err := useCase.GetAvailableCatalogItemQuantity(c.Request.Context(), id)
-		if err != nil {
-			log.Println(err)
-			c.String(http.StatusInternalServerError, "unknown error")
-		} else {
-			c.JSON(200, stock)
-		}
-
-	})
-
-	router.GET("/products", func(c *gin.Context) {
-		catalogItemIds := c.QueryArray("ids")
-		ids := parseInt(catalogItemIds)
-		stocks, err := useCase.GetAvailableCatalogItemsQuantity(c.Request.Context(), ids)
-		if err != nil {
-			log.Println(err)
-			c.String(http.StatusInternalServerError, "unknown error")
-		} else {
-			c.JSON(200, stocks)
-		}
-
-	})
+	api.Start(ctx)
 	_ = r.Run() // listen and serve on 0.0.0.0:8080
 }

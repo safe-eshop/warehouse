@@ -11,9 +11,9 @@ import (
 )
 
 type WarehouseStateUseCase interface {
-	GetAvailableCatalogItemQuantity(id model.CatalogItemId) (*dto.AvailableQuantity, error)
-	GetAvailableCatalogItemsQuantity(ids []model.CatalogItemId) ([]*dto.AvailableQuantity, error)
-	SeedDatabase() error
+	GetAvailableCatalogItemQuantity(ctx context.Context, id model.CatalogItemId) (*dto.AvailableQuantity, error)
+	GetAvailableCatalogItemsQuantity(ctx context.Context, ids []model.CatalogItemId) ([]*dto.AvailableQuantity, error)
+	SeedDatabase(ctx context.Context) error
 }
 
 type warehouseStateUseCase struct {
@@ -21,22 +21,22 @@ type warehouseStateUseCase struct {
 	service *service.WarehouseStateService
 }
 
-func NewWarehouseStateUseCaseUseCase(repo repository.WarehouseStateRepository, service *service.WarehouseStateService) *warehouseStateUseCase {
-	return &warehouseStateUseCase{
+func NewWarehouseStateUseCaseUseCase(repo repository.WarehouseStateRepository, service *service.WarehouseStateService) warehouseStateUseCase {
+	return warehouseStateUseCase{
 		repo:    repo,
 		service: service,
 	}
 }
 
-func (u *warehouseStateUseCase) GetAvailableCatalogItemQuantity(ctx context.Context, id model.CatalogItemId) (*dto.AvailableQuantity, error) {
+func (u warehouseStateUseCase) GetAvailableCatalogItemQuantity(ctx context.Context, id model.CatalogItemId) (*dto.AvailableQuantity, error) {
 	return u.service.GetAvailableCatalogItemQuantity(ctx, id)
 }
 
-func (u *warehouseStateUseCase) GetAvailableCatalogItemsQuantity(ctx context.Context, ids []model.CatalogItemId) ([]*dto.AvailableQuantity, error) {
+func (u warehouseStateUseCase) GetAvailableCatalogItemsQuantity(ctx context.Context, ids []model.CatalogItemId) ([]*dto.AvailableQuantity, error) {
 	return u.service.GetAvailableCatalogItemsQuantity(ctx, ids)
 }
 
-func (u *warehouseStateUseCase) SeedDatabase(ctx context.Context) error {
+func (u warehouseStateUseCase) SeedDatabase(ctx context.Context) error {
 	q, err := u.repo.Count(ctx)
 	if err != nil {
 		return err
